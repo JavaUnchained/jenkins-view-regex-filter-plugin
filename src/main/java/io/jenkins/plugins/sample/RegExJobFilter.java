@@ -7,7 +7,6 @@ import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
-import hudson.util.RunList;
 import hudson.views.ViewJobFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -29,19 +27,16 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
             void doGetMatchValues(TopLevelItem item, Options options, List<String> values) {
                 if (item.getAllJobs() != null) {
                     ArrayList<Job> jobs = new ArrayList<>(item.getAllJobs());
-                    if(options.matchName){
-                        for (Job job : jobs) {
-                            RunList runList = job.getBuilds();
-                            Iterator iterator = runList.listIterator();
-                            while (iterator.hasNext()) {
-                                Run run = (Run) iterator.next();
+                    for (Job job : jobs) {
+                        Iterator iterator = job.getBuilds().listIterator();
+                        while (iterator.hasNext()) {
+                            Run run = (Run) iterator.next();
+                            if(options.matchFullName) {
                                 values.add(run.getFullDisplayName());
                             }
-                        }
-                    }
-                    if(options.matchFullName){
-                        for (Job job : jobs) {
-                            values.add(job.getLastBuild().getFullDisplayName());
+                            if(options.matchName) {
+                                values.add(run.getDisplayName());
+                            }
                         }
                     }
                 }
