@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    Filter for build-monitor view by version (build name)
+</div>

@@ -1,0 +1,20 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <f:entry title="${%Regular Expression}:">
+      <f:textbox name="regex" field="regex" checkUrl="'${rootURL}/descriptorByName/io.jenkins.plugins.sample.RegExJobFilter/checkRegex?value='+encodeURIComponent(this.value)"/>
+  </f:entry>
+  <f:entry title="${%Match Value}:">
+    <div class="valueType">
+      <select name="valueTypeString" class="setting-input" onchange="this.parentElement.querySelector('.nameOptions').style.display = ((this.options[this.selectedIndex].value.match(/NAME/)) ? 'block' : 'none')">
+        <f:option value="BUILD_VERSION" selected="${instance.valueTypeString == 'BUILD_VERSION'}">${%Build name}</f:option>
+      </select>
+      <div class="nameOptions" style="display: ${(empty instance.valueTypeString || instance.valueTypeString.contains('NAME')) ? 'block' : 'none'}">
+        <f:checkbox name="matchName" field="matchName" default="true" /> ${%Display name}
+        <f:checkbox name="matchFullName" field="matchFullName" default="false" /> ${%Full display name}
+      </div>
+    </div>
+  </f:entry>
+  <st:include page="config.jelly" class="io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter" optional="false"/>
+</j:jelly>
