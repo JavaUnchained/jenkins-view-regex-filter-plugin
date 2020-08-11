@@ -4,8 +4,10 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.Job;
+import hudson.model.Run;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
+import hudson.util.RunList;
 import hudson.views.ViewJobFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -13,7 +15,9 @@ import org.kohsuke.stapler.QueryParameter;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -27,7 +31,12 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
                     ArrayList<Job> jobs = new ArrayList<>(item.getAllJobs());
                     if(options.matchName){
                         for (Job job : jobs) {
-                            values.add(job.getLastBuild().getDisplayName());
+                            RunList runList = job.getBuilds();
+                            Iterator iterator = runList.listIterator();
+                            while (iterator.hasNext()) {
+                                Run run = (Run) iterator.next();
+                                values.add(run.getFullDisplayName());
+                            }
                         }
                     }
                     if(options.matchFullName){
