@@ -28,13 +28,12 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
                 if (item.getAllJobs() != null) {
                     ArrayList<Job> jobs = new ArrayList<>(item.getAllJobs());
                     for (Job job : jobs) {
-                        Iterator iterator = job.getBuilds().listIterator();
-                        while (iterator.hasNext()) {
+                        for (Iterator iterator = job.getBuilds().listIterator(); iterator.hasNext(); ) {
                             Run run = (Run) iterator.next();
-                            if(options.matchFullName) {
+                            if (options.matchFullName) {
                                 values.add(run.getFullDisplayName());
                             }
-                            if(options.matchName) {
+                            if (options.matchName) {
                                 values.add(run.getDisplayName());
                             }
                         }

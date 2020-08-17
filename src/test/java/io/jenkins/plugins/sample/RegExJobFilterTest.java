@@ -82,30 +82,19 @@ public class RegExJobFilterTest extends AbstractJenkinsTest {
 		);
 	}
 
-//	@Test
-//	public void testHelpExample() {
-//		List<TopLevelItem> all = asList(
-//				freeStyleProject().name("0-Test_Job").asItem(),
-//				freeStyleProject().name("1-Test_Job").trigger("@midnight").asItem(),
-//				freeStyleProject().name("2-Job").asItem(),
-//				freeStyleProject().name("3-Test_Job").trigger("@daily").asItem(),
-//				freeStyleProject().name("4-Job").trigger("@midnight").asItem(),
-//				freeStyleProject().name("5-Test_Job").trigger("@midnight").asItem(),
-//				freeStyleProject().name("6-Test_Job").asItem()
-//		);
-//
-//		List<TopLevelItem> filtered = new ArrayList<TopLevelItem>();
-//
-//		RegExJobFilter includeTests = new RegExJobFilter(".*Test.*", includeMatched.name(), BUILD_VERSION.name());
-//		filtered = includeTests.filter(filtered, all, null);
-//		assertThat(filtered, is(asList(
-//				all.get(0),
-//				all.get(1),
-//				all.get(3),
-//				all.get(5),
-//				all.get(6)
-//		)));
-//	}
+	@Test
+	public void testHelpExample() {
+		List<TopLevelItem> all = asList(
+				freeStyleProject().name("0-Test_Job").asItem(),
+				freeStyleProject().name("1-Job").asItem(),
+				freeStyleProject().name("2-Test_Job").asItem()
+		);
+		List<TopLevelItem> filtered = new ArrayList<TopLevelItem>();
+
+		RegExJobFilter includeTests = new RegExJobFilter(".*Test.*", includeMatched.name(), BUILD_VERSION.name());
+		filtered = includeTests.filter(filtered, all, null);
+		assertThat(filtered, is(asList(all.get(0), all.get(1))));
+	}
 
 	private void testConfigRoundtrip(String viewName, RegExJobFilter... filters) throws Exception {
 		List<RegExJobFilter> expectedFilters = new ArrayList<RegExJobFilter>();
