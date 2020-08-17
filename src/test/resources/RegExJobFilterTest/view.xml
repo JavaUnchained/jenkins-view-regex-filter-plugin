@@ -10,7 +10,7 @@
     <jobFilters>
         <io.jenkins.plugins.sample.RegExJobFilter>
             <includeExcludeTypeString>includeMatched</includeExcludeTypeString>
-            <valueTypeString>NAME</valueTypeString>
+            <valueTypeString>BUILD_VERSION</valueTypeString>
             <regex>.*</regex>
         </io.jenkins.plugins.sample.RegExJobFilter>
     </jobFilters>

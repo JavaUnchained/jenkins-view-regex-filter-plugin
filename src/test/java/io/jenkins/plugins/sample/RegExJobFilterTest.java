@@ -1,12 +1,8 @@
 package io.jenkins.plugins.sample;
 
-import com.cloudbees.hudson.plugins.folder.Folder;
-import hudson.model.Job;
 import hudson.model.ListView;
-import hudson.model.TopLevelItem;
 import hudson.model.View;
 import hudson.views.ViewJobFilter;
-import jenkins.model.Jenkins;
 import org.junit.Test;
 import org.jvnet.hudson.test.WithoutJenkins;
 
@@ -15,63 +11,28 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter.IncludeExcludeType.*;
-import static io.jenkins.plugins.sample.JobMocker.freeStyleProject;
-import static io.jenkins.plugins.sample.JobMocker.jobOfType;
-import static io.jenkins.plugins.sample.JobType.*;
+import static io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter.IncludeExcludeType.excludeMatched;
+import static io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter.IncludeExcludeType.includeMatched;
 import static io.jenkins.plugins.sample.RegExJobFilter.ValueType.BUILD_VERSION;
-import static io.jenkins.plugins.sample.ViewJobFilters.NameOptions.*;
-import static io.jenkins.plugins.sample.ViewJobFilters.*;
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class RegExJobFilterTest extends AbstractJenkinsTest {
 
-//	@Test
-//	@WithoutJenkins
-//	public void testName() {
-//		assertFalse(nameRegex(".*", MATCH_NAME).matches(jobOfType(TOP_LEVEL_ITEM).asItem()));
-//		assertFalse(nameRegex(".*", MATCH_FULL_NAME).matches(jobOfType(TOP_LEVEL_ITEM).asItem()));
-//
-//		for (JobType<? extends Job> type: availableJobTypes(FREE_STYLE_PROJECT, MATRIX_PROJECT)) {
-//			assertFalse(nameRegex(".*", MATCH_NAME).matches(jobOfType(type).name(null).asItem()));
-//			assertTrue(nameRegex(".*", MATCH_NAME).matches(jobOfType(type).name("").asItem()));
-//			assertTrue(nameRegex("Foo", MATCH_NAME).matches(jobOfType(type).name("Foo").asItem()));
-//			assertFalse(nameRegex("Foo", MATCH_NAME).matches(jobOfType(type).name("Foobar").asItem()));
-//			assertTrue(nameRegex("Foo.*", MATCH_NAME).matches(jobOfType(type).name("Foobar").asItem()));
-//			assertFalse(nameRegex("bar", MATCH_NAME).matches(jobOfType(type).name("Foobar").asItem()));
-//			assertTrue(nameRegex(".*bar", MATCH_NAME).matches(jobOfType(type).name("Foobar").asItem()));
-//			assertTrue(nameRegex(".ooba.", MATCH_NAME).matches(jobOfType(type).name("Foobar").asItem()));
-//
-//			assertFalse(nameRegex(".*", MATCH_FULL_NAME).matches(jobOfType(type).fullName(null).asItem()));
-//			assertTrue(nameRegex(".*", MATCH_FULL_NAME).matches(jobOfType(type).fullName("").asItem()));
-//			assertTrue(nameRegex("folder/Foo", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foo").asItem()));
-//			assertFalse(nameRegex("folder/Foo", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//			assertTrue(nameRegex("folder/Foo.*", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//			assertFalse(nameRegex("folder/bar", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//			assertTrue(nameRegex("folder/.*bar", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//			assertTrue(nameRegex("folder/.ooba.", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//			assertTrue(nameRegex(".*der/Foobar", MATCH_FULL_NAME).matches(jobOfType(type).fullName("folder/Foobar").asItem()));
-//		}
-//	}
+	@Test
+	@WithoutJenkins
+	public void testBackwardsCompatibleDeserialization() throws IOException {
+		InputStream xml = RegExJobFilter.class.getResourceAsStream("/RegExJobFilterTest/view.xml");
+		ListView listView = (ListView) View.createViewFromXML("foo", xml);
 
-//	@Test
-//	@WithoutJenkins
-//	public void testBackwardsCompatibleDeserialization() throws IOException {
-//		InputStream xml = RegExJobFilter.class.getResourceAsStream("/RegExJobFilterTest/view.xml");
-//		ListView listView = (ListView) View.createViewFromXML("foo", xml);
-//
-//		RegExJobFilter filter = (RegExJobFilter) listView.getJobFilters().iterator().next();
-//		assertThat(filter.getIncludeExcludeTypeString(), is(includeMatched.name()));
-//		assertThat(filter.getValueTypeString(), is(BUILD_VERSION.name()));
-//		assertThat(filter.getRegex(), is(".*"));
-//		assertThat(filter.isMatchName(), is(true));
-//		assertThat(filter.isMatchFullName(), is(false));
-//	}
+		RegExJobFilter filter = (RegExJobFilter) listView.getJobFilters().iterator().next();
+		assertThat(filter.getIncludeExcludeTypeString(), is(includeMatched.name()));
+		assertThat(filter.getValueTypeString(), is(BUILD_VERSION.name()));
+		assertThat(filter.getRegex(), is(".*"));
+		assertThat(filter.isMatchName(), is(true));
+		assertThat(filter.isMatchFullName(), is(false));
+	}
 
 	@Test
 	public void testConfigRoundtrip() throws Exception {
@@ -80,20 +41,6 @@ public class RegExJobFilterTest extends AbstractJenkinsTest {
 				new RegExJobFilter("NaMeRegEx", excludeMatched.name(), BUILD_VERSION.name(),
 					false, true)
 		);
-	}
-
-	@Test
-	public void testHelpExample() {
-		List<TopLevelItem> all = asList(
-				freeStyleProject().name("0-Test_Job").asItem(),
-				freeStyleProject().name("1-Job").asItem(),
-				freeStyleProject().name("2-Test_Job").asItem()
-		);
-		List<TopLevelItem> filtered = new ArrayList<TopLevelItem>();
-
-		RegExJobFilter includeTests = new RegExJobFilter(".*Test.*", includeMatched.name(), BUILD_VERSION.name());
-		filtered = includeTests.filter(filtered, all, null);
-		assertThat(filtered, is(asList(all.get(0), all.get(1))));
 	}
 
 	private void testConfigRoundtrip(String viewName, RegExJobFilter... filters) throws Exception {

@@ -12,7 +12,6 @@ public class JobType<T extends Job> {
     public static final JobType<FreeStyleProject> FREE_STYLE_PROJECT = new JobType("hudson.model.FreeStyleProject");
     public static final JobType<MatrixProject> MATRIX_PROJECT = new JobType("hudson.matrix.MatrixProject");
     public static final JobType<Job> TOP_LEVEL_ITEM = new JobType("hudson.model.Job", "hudson.model.TopLevelItem" );
-    public static final JobType<WorkflowJob> WORKFLOW_JOB = new JobType("org.jenkinsci.plugins.workflow.job.WorkflowJob");
 
     private Class<T> jobClass;
     private Class<T>[] interfaces;

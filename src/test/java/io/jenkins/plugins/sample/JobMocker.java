@@ -1,24 +1,27 @@
 package io.jenkins.plugins.sample;
 
 import hudson.model.*;
-import hudson.triggers.Trigger;
-import hudson.triggers.TriggerDescriptor;
+import hudson.security.ACL;
+import hudson.security.Permission;
+import hudson.tasks.Maven;
 import hudson.util.DescribableList;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import jenkins.model.ParameterizedJobMixIn;
 import org.mockito.MockSettings;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import static io.jenkins.plugins.sample.JobType.*;
+import static io.jenkins.plugins.sample.JobType.FREE_STYLE_PROJECT;
+import static java.util.Arrays.asList;
 import static org.mockito.Mockito.*;
 
 public class JobMocker<T extends Job> {
 
+    public enum MavenBuildStep {
+        PRE, POST
+    }
 
     T job;
 
@@ -82,20 +85,64 @@ public class JobMocker<T extends Job> {
         return this;
     }
 
-    public JobMocker<T> trigger(String spec) {
-        Trigger trigger = mock(Trigger.class);
-        when(trigger.getSpec()).thenReturn(spec);
+    public JobMocker<T> result(Result result) {
+        Build lastBuild = mock(Build.class);
+        when(lastBuild.getResult()).thenReturn(result);
+        when(job.getLastCompletedBuild()).thenReturn(lastBuild);
+        return this;
+    }
 
-        Map<TriggerDescriptor, Trigger<?>> triggers = new HashMap<TriggerDescriptor, Trigger<?>>();
-        triggers.put(mock(TriggerDescriptor.class), trigger);
-
-        if (job instanceof AbstractProject) { // TODO replace this and next by ParameterizedJobMixIn.ParameterizedJob
-            when(((AbstractProject)job).getTriggers()).thenReturn(triggers);
-        }
-        if (instanceOf(job, WORKFLOW_JOB)) {
-            when(((WorkflowJob)job).getTriggers()).thenReturn(triggers);
+    public JobMocker<T> disabled(boolean disabled) {
+        if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
+            when(((ParameterizedJobMixIn.ParameterizedJob) job).isDisabled()).thenReturn(disabled);
         }
         return this;
+    }
+
+    public JobMocker<T> building(boolean building) {
+        when(job.isBuilding()).thenReturn(building);
+        return this;
+    }
+
+    public JobMocker<T> inQueue(boolean inQueue) {
+        when(job.isInQueue()).thenReturn(inQueue);
+        return this;
+    }
+
+    public JobMocker<T> lastBuild(AbstractBuild build) {
+        when(job.getLastBuild()).thenReturn(build);
+        return this;
+    }
+
+    public JobMocker<T> lastBuilds(AbstractBuild... builds) {
+        if (builds.length > 0) {
+            lastBuild(builds[0]);
+            for (int i = 0; i < builds.length - 1; i++) {
+                when(builds[i].getPreviousBuild()).thenReturn(builds[i + 1]);
+            }
+        }
+        return this;
+    }
+
+    public JobMocker<T> permissions(Permission... permissions) {
+        ACL acl = mock(ACL.class);
+        for (Permission permission: permissions) {
+            when(acl.hasPermission(permission)).thenReturn(true);
+        }
+        when(job.getACL()).thenReturn(acl);
+        return this;
+    }
+
+    private Maven mockMaven(final String targets, final String name, final String properties, final String opts) {
+        final Maven.MavenInstallation mavenInstallation = mock(Maven.MavenInstallation.class);
+        when(mavenInstallation.getName()).thenReturn(name);
+
+        return new Maven(targets, name, "", properties, opts) {
+            @Override
+            public MavenInstallation getMaven() {
+                return mavenInstallation;
+            }
+        };
     }
 
     public JobMocker<T> assignedLabel(String label) {
@@ -103,6 +150,30 @@ public class JobMocker<T extends Job> {
             when(((AbstractProject)job).getAssignedLabelString()).thenReturn(label);
         }
         return this;
+    }
+
+    public JobMocker<T> parameters(ParameterDefinition... definitions) {
+        ParametersDefinitionProperty prop = new ParametersDefinitionProperty(definitions);
+        when(job.getProperty(ParametersDefinitionProperty.class)).thenReturn(prop);
+        return this;
+    }
+
+    public JobMocker<T> upstream(AbstractProject... upstreamProjects) {
+        if (job instanceof AbstractProject) {
+            when(((AbstractProject)job).getUpstreamProjects()).thenReturn(asList(upstreamProjects));
+        }
+        return this;
+    }
+
+    public JobMocker<T> downstream(AbstractProject... downstreamProjects) {
+        if (job instanceof AbstractProject) {
+            when(((AbstractProject)job).getDownstreamProjects()).thenReturn(asList(downstreamProjects));
+        }
+        return this;
+    }
+
+    public T asJob() {
+        return job;
     }
 
     public TopLevelItem asItem() {
