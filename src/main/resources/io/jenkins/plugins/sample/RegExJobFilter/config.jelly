@@ -13,8 +13,8 @@
         <f:option value="BUILD_VERSION" selected="${instance.valueTypeString == 'BUILD_VERSION'}">${%Build name}</f:option>
       </select>
       <div class="nameOptions" style="display: ${(empty instance.valueTypeString || instance.valueTypeString.contains('NAME')) ? 'block' : 'none'}">
-        <f:checkbox name="matchName" field="matchName" default="true" /> ${%Display name}
-        <f:checkbox name="matchFullName" field="matchFullName" default="false" /> ${%Full display name}
+        <f:checkbox name="matchName" field="matchName" default="true" /> ${%Name}
+        <f:checkbox name="matchFullName" field="matchFullName" default="false" /> ${%Full name}
         <f:checkbox name="matchDisplayName" field="matchDisplayName" default="false" /> ${%Display name}
         <f:checkbox name="matchFullDisplayName" field="matchFullDisplayName" default="false" /> ${%Full display name}
       </div>
