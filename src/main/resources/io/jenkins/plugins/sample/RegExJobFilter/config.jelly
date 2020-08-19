@@ -8,11 +8,15 @@
   <f:entry title="${%Match Value}:">
     <div class="valueType">
       <select name="valueTypeString" class="setting-input" onchange="this.parentElement.querySelector('.nameOptions').style.display = ((this.options[this.selectedIndex].value.match(/NAME/)) ? 'block' : 'none')">
+        <f:option value="NAME" selected="${instance.valueTypeString == 'NAME'}">${%Job name}</f:option>
+        <f:option value="FOLDER_NAME" selected="${instance.valueTypeString == 'FOLDER_NAME'}">${%Job folder name}</f:option>
         <f:option value="BUILD_VERSION" selected="${instance.valueTypeString == 'BUILD_VERSION'}">${%Build name}</f:option>
       </select>
       <div class="nameOptions" style="display: ${(empty instance.valueTypeString || instance.valueTypeString.contains('NAME')) ? 'block' : 'none'}">
         <f:checkbox name="matchName" field="matchName" default="true" /> ${%Display name}
         <f:checkbox name="matchFullName" field="matchFullName" default="false" /> ${%Full display name}
+        <f:checkbox name="matchDisplayName" field="matchDisplayName" default="false" /> ${%Display name}
+        <f:checkbox name="matchFullDisplayName" field="matchFullDisplayName" default="false" /> ${%Full display name}
       </div>
     </div>
   </f:entry>

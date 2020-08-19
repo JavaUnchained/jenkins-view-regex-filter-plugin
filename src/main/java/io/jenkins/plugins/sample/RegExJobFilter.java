@@ -2,10 +2,7 @@ package io.jenkins.plugins.sample;
 
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.Descriptor;
-import hudson.model.Job;
-import hudson.model.Run;
-import hudson.model.TopLevelItem;
+import hudson.model.*;
 import hudson.util.FormValidation;
 import hudson.views.ViewJobFilter;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -22,6 +19,42 @@ import java.util.regex.PatternSyntaxException;
 public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
 
     public enum ValueType {
+        NAME {
+            @Override
+            void doGetMatchValues(TopLevelItem item, Options options, List<String> values) {
+                if (options.matchName) {
+                    values.add(item.getName());
+                }
+                if (options.matchFullName) {
+                    values.add(item.getFullName());
+                }
+                if (options.matchDisplayName) {
+                    values.add(item.getDisplayName());
+                }
+                if (options.matchFullDisplayName) {
+                    values.add(item.getFullDisplayName());
+                }
+            }
+        },
+        FOLDER_NAME {
+            @Override
+            void doGetMatchValues(TopLevelItem item, Options options, List<String> values) {
+                if (item.getParent() != null) {
+                    if (options.matchName && item.getParent() instanceof Item) {
+                        values.add(((Item)item.getParent()).getName());
+                    }
+                    if (options.matchFullName) {
+                        values.add(item.getParent().getFullName());
+                    }
+                    if (options.matchDisplayName) {
+                        values.add(item.getParent().getDisplayName());
+                    }
+                    if (options.matchFullDisplayName) {
+                        values.add(item.getParent().getFullDisplayName());
+                    }
+                }
+            }
+        },
         BUILD_VERSION {
             @Override
             void doGetMatchValues(TopLevelItem item, Options options, List<String> values) {
@@ -30,10 +63,10 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
                     for (Job job : jobs) {
                         for (Iterator iterator = job.getBuilds().listIterator(); iterator.hasNext(); ) {
                             Run run = (Run) iterator.next();
-                            if (options.matchFullName) {
+                            if (options.matchFullName || options.matchFullDisplayName) {
                                 values.add(run.getFullDisplayName());
                             }
-                            if (options.matchName) {
+                            if (options.matchName || options.matchDisplayName) {
                                 values.add(run.getDisplayName());
                             }
                         }
@@ -54,10 +87,14 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
     public static class Options {
         public final boolean matchName;
         public final boolean matchFullName;
+        public final boolean matchDisplayName;
+        public final boolean matchFullDisplayName;
 
-        public Options(boolean matchName, boolean matchFullName) {
+        public Options(boolean matchName, boolean matchFullName, boolean matchDisplayName, boolean matchFullDisplayName) {
             this.matchName = matchName;
             this.matchFullName = matchFullName;
+            this.matchDisplayName = matchDisplayName;
+            this.matchFullDisplayName = matchFullDisplayName;
         }
     }
 
@@ -67,14 +104,16 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
     transient private Pattern pattern;
     private boolean matchName;
     private boolean matchFullName;
+    private boolean matchDisplayName;
+    private boolean matchFullDisplayName;
 
     public RegExJobFilter(String regex, String includeExcludeTypeString, String valueTypeString) {
-        this(regex, includeExcludeTypeString, valueTypeString, true, false);
+        this(regex, includeExcludeTypeString, valueTypeString, true, false, false, false);
     }
 
     @DataBoundConstructor
     public RegExJobFilter(String regex, String includeExcludeTypeString, String valueTypeString,
-                          boolean matchName, boolean matchFullName) {
+                          boolean matchName, boolean matchFullName, boolean matchDisplayName, boolean matchFullDisplayName) {
         super(includeExcludeTypeString);
         this.regex = regex;
         this.pattern = Pattern.compile(regex);
@@ -82,11 +121,13 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
         this.valueType = ValueType.valueOf(valueTypeString);
         this.matchName = matchName;
         this.matchFullName = matchFullName;
+        this.matchDisplayName = matchDisplayName;
+        this.matchFullDisplayName = matchFullDisplayName;
         initOptions();
     }
 
     private void initOptions() {
-        if (!this.matchName && !this.matchFullName) {
+        if (!this.matchName && !this.matchFullName && !this.matchDisplayName && !this.matchFullDisplayName) {
             this.matchName = true;
         }
     }
@@ -129,8 +170,15 @@ public class RegExJobFilter extends AbstractIncludeExcludeJobFilter {
         return matchName;
     }
 
+    public boolean isMatchDisplayName() {
+        return matchDisplayName;
+    }
+    public boolean isMatchFullDisplayName() {
+        return matchFullDisplayName;
+    }
+
     public Options getOptions() {
-        return new Options(matchName, matchFullName);
+        return new Options(matchName, matchFullName, matchDisplayName, matchFullDisplayName);
     }
 
     @Extension
