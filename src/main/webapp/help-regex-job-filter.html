@@ -17,9 +17,33 @@
     </dd>
     <dt>Match type:</dt>
     <dd>
-        There's one kinds of match types (implicitly):
-        <ul style="margin-top:0px">5
+        <ul style="margin:0px">
+            <li><i>Job name</i>
+                <ul>
+                    <li><i>Name</i> of the job itself, e.g. 'job'</li>
+                    <li><i>Full name</i> of the job including parent folders, e.g. 'folder/subfolder/job'</li>
+                    <li><i>Display name</i> of the job, e.g. 'Job'</li>
+                    <li><i>Full display name</i> of the job including parent folders, e.g. 'Folder » SubFolder » Job'
+                    </li>
+                </ul>
+            </li>
+            <li><i>Job folder name</i>: the name of the job's parent folder
+                <ul>
+                    <li><i>Name</i> of the folder itself, e.g. 'subfolder'</li>
+                    <li><i>Full name</i> of the folder including parent folders, e.g. 'folder/subfolder'</li>
+                    <li><i>Display name</i> of the folder, e.g. 'SubFolder'</li>
+                    <li><i>Full display name</i> of the folder including parent folders, e.g. 'Folder » SubFolder'</li>
+                </ul>
+            </li>
+            <li><i>Build name</i>: matches by display name of build</li>
+        </ul>
+    </dd>
+    <dt>Match type:</dt>
+    <dd>
+        Whether to add or remove jobs from this view. There's two kinds of match types:<br>
+        <ul style="margin-top:0px">
             <li>Include matched/unmatched: adds additional jobs to this view.</li>
+            <li>Exclude matched/unmatched: removes jobs from this view that have been included by previous filters.</li>
         </ul>
     </dd>
 </dl>
