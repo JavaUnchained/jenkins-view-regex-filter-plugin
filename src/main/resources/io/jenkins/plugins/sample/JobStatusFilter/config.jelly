@@ -9,5 +9,5 @@
     <f:checkbox name="aborted" field="aborted"/> ${%Aborted}
     <f:checkbox name="disabled" field="disabled"/> ${%Disabled}
   </f:entry>
-  <st:include page="config.jelly" class="hudson.views.AbstractIncludeExcludeJobFilter" optional="false"/>
+  <st:include page="config.jelly" class="io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter" optional="false"/>
 </j:jelly>
