@@ -1,9 +1,8 @@
-package io.jenkins.plugins.sample;
+package io.jenkins.plugins.sample.TestHelpers;
 
 import hudson.matrix.MatrixProject;
 import hudson.model.FreeStyleProject;
 import hudson.model.Job;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 import java.util.ArrayList;
 import java.util.List;

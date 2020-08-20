@@ -1,4 +1,4 @@
-package io.jenkins.plugins.sample;
+package io.jenkins.plugins.sample.TestHelpers;
 
 import hudson.model.*;
 import hudson.security.ACL;
@@ -13,7 +13,7 @@ import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 
-import static io.jenkins.plugins.sample.JobType.FREE_STYLE_PROJECT;
+import static io.jenkins.plugins.sample.TestHelpers.JobType.FREE_STYLE_PROJECT;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.*;
 

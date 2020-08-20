@@ -1,4 +1,4 @@
-package io.jenkins.plugins.sample;
+package io.jenkins.plugins.sample.TestHelpers;
 
 import hudson.model.*;
 import hudson.plugins.nested_view.NestedView;

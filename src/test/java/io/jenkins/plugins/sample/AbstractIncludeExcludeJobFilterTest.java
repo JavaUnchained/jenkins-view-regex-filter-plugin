@@ -1,13 +1,14 @@
 package io.jenkins.plugins.sample;
 
 import hudson.model.TopLevelItem;
+import io.jenkins.plugins.sample.TestHelpers.AbstractJenkinsTest;
 import org.junit.Test;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import java.util.List;
 
 import static io.jenkins.plugins.sample.AbstractIncludeExcludeJobFilter.IncludeExcludeType.*;
-import static io.jenkins.plugins.sample.JobMocker.freeStyleProject;
+import static io.jenkins.plugins.sample.TestHelpers.JobMocker.freeStyleProject;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
