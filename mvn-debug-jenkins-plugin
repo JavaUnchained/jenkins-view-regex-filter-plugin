@@ -1,0 +1,8 @@
+#!/bin/bash
+export JAVA_HOME=/home/bercut/jdk-8u221/jdk1.8.0_221
+
+mvn -version
+
+mvn clean package -e
+
+mv target/*.hpi "$*"
